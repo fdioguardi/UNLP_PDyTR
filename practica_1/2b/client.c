@@ -19,7 +19,7 @@ int main(int argc, char *argv[]) {
   struct hostent *server;
 
   if (argc < 3) {
-    fprintf(stderr, "usage %s hostname port\n", argv[0]);
+    fprintf(stderr, "Client:: usage %s hostname port\n", argv[0]);
     exit(0);
   }
 
@@ -32,13 +32,13 @@ int main(int argc, char *argv[]) {
   sockfd = socket(AF_INET, SOCK_STREAM, 0);
 
   if (sockfd < 0) {
-    error("ERROR opening socket");
+    error("Client:: ERROR opening socket");
   }
 
   // Toma la direccion del server de los argumentos
   server = gethostbyname(argv[1]);
   if (server == NULL) {
-    fprintf(stderr, "ERROR, no such host\n");
+    fprintf(stderr, "Client:: ERROR, no such host\n");
     exit(0);
   }
   bzero((char *)&serv_addr, sizeof(serv_addr));
@@ -51,24 +51,32 @@ int main(int argc, char *argv[]) {
 
   // Descriptor - direccion - tamaño direccion
   if (connect(sockfd, &serv_addr, sizeof(serv_addr)) < 0) {
-    error("ERROR connecting");
+    error("Client:: ERROR connecting");
   }
 
   // Send 4 messages, each with different sizes
+  char buffer[lround(pow(10, 6))];
   for (int i = 3; i < 7; i++) {
     int msg_len = lround(pow(10, i));
-    char buffer[msg_len];
 
+    // Clean buffer
     bzero(buffer, msg_len);
-    fgets(buffer, msg_len, stdin);
 
-    // Envia un mensaje al socket
-    if (write(sockfd, buffer, strlen(buffer)) < 0) {
-      error("ERROR writing to socket");
+    // Fill buffer with '$'
+    memset(buffer, '$', msg_len);
+
+    // Send message to socket
+    printf("Client:: Sending a %d (10^%d) bytes long message\n", msg_len, i);
+    if (write(sockfd, buffer, msg_len) < 0) {
+      error("Client:: ERROR writing to socket");
     }
 
-    bzero(buffer, 256);
+    // Await server's confirmation
+    read(sockfd, buffer, strlen("Recieved."));
+
+    bzero(buffer, msg_len);
   }
+  close(sockfd);
 
   return 0;
 }
