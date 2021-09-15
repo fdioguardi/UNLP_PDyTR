@@ -56,29 +56,24 @@ int main(int argc, char *argv[]) {
   }
 
   // intenta leer los mensajes del cliente
+  int bytes_read;
   char buffer[lround(pow(10, 6))];
-  int msg_len, bytes_read;
-  for (int i = 3; i < 7; i++) {
-    msg_len = lround(pow(10, i));
+  bzero(buffer, sizeof(buffer));
 
-    bzero(buffer, msg_len);
+  // lee el mensaje del cliente
+  printf("Server:: Attempting to read a %lu bytes long message\n",
+         sizeof(buffer));
 
-    // lee el mensaje del cliente
-    printf("Server:: Attempting to read a %d (10^%d) bytes long message\n",
-           msg_len, i);
+  bytes_read = read(newsockfd, buffer, sizeof(buffer));
 
-    int bytes_read = read(newsockfd, buffer, msg_len);
-
-    if (bytes_read < 0) {
-      error("Server:: ERROR reading from socket");
-    }
-
-    printf("Server:: Length of message recieved: %d\n", bytes_read);
-    printf("-----------------------------------------------------------\n");
-
-    // avisa que el mensaje fue recivido
-    write(newsockfd, "Recieved.", strlen("Recieved."));
+  if (bytes_read < 0) {
+    error("Server:: ERROR reading from socket");
   }
+
+  printf("Server:: Length of message recieved: %d\n", bytes_read);
+  printf("-----------------------------------------------------------\n");
+  bzero(buffer, sizeof(buffer));
+
   close(sockfd);
   close(newsockfd);
 

@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/socket.h>
+#include <sys/time.h>
 #include <sys/types.h>
 #include <unistd.h>
 
@@ -60,35 +61,32 @@ int main(int argc, char *argv[]) {
   char buffer[lround(pow(10, 6))];
   int msg_len, bytes_read;
   int offset = 0;
+  double timestamp;
 
   for (int i = 3; i < 7; i++) {
+    for (int j = 0; j < 100; j++) {
 
-    // longitud del mensaje que toca recibir
-    msg_len = lround(pow(10, i));
+      // longitud del mensaje que toca recibir
+      msg_len = lround(pow(10, i));
 
-    bzero(buffer, msg_len);
+      bzero(buffer, msg_len);
 
-    // lee el mensaje del cliente
-    printf("Server:: Read a %d (10^%d) bytes long message\n", msg_len, i);
+      do {
+        bytes_read = read(newsockfd, &buffer[offset], msg_len - offset);
 
-    do {
-      bytes_read = read(newsockfd, &buffer[offset], msg_len - offset);
+        if (bytes_read < 0) {
+          error("Server:: ERROR reading from socket");
+        }
 
-      if (bytes_read < 0) {
-        error("Server:: ERROR reading from socket");
-      }
+        offset += bytes_read;
 
-      offset += bytes_read;
+      } while (offset != msg_len);
 
-    } while (offset != msg_len);
+      // avisa que el mensaje fue recivido enviando el mismo mensaje de vuelta
+      write(newsockfd, buffer, 8);
 
-    printf("Server:: Length of message recieved: %d\n", offset);
-    printf("-----------------------------------------------------------\n");
-
-    // avisa que el mensaje fue recivido
-    write(newsockfd, "Recieved.", strlen("Recieved."));
-
-    offset = 0;
+      offset = 0;
+    }
   }
   close(sockfd);
   close(newsockfd);

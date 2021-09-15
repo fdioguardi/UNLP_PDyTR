@@ -5,8 +5,19 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/socket.h>
+#include <sys/time.h>
 #include <sys/types.h>
 #include <unistd.h>
+
+// Para calcular tiempo
+double dwalltime() {
+  double sec;
+  struct timeval tv;
+
+  gettimeofday(&tv, NULL);
+  sec = tv.tv_sec + tv.tv_usec / 1000000.0;
+  return sec;
+}
 
 void error(char *msg) {
   perror(msg);
@@ -54,19 +65,35 @@ int main(int argc, char *argv[]) {
     error("Client:: ERROR connecting");
   }
 
-  // Fill buffer with '$'
+  // Send 4 messages, each with different sizes
   char buffer[lround(pow(10, 6))];
-  bzero(buffer, sizeof(buffer));
-  memset(buffer, '$', sizeof(buffer));
+  int msg_len;
+  double timestamp;
 
-  // Send message to socket
-  printf("Client:: Sending a %lu bytes long message\n", sizeof(buffer));
-  if (write(sockfd, buffer, sizeof(buffer)) < 0) {
-    error("Client:: ERROR writing to socket");
+  for (int i = 3; i < 7; i++) {
+    printf("10 a la %d\n", i);
+    for (int j = 0; j < 100; j++) {
+      int msg_len = lround(pow(10, i));
+
+      // Clean buffer
+      bzero(buffer, msg_len);
+
+      // Fill buffer with '$'
+      memset(buffer, '$', msg_len);
+
+      timestamp = dwalltime();
+
+      // Send message to socket
+      if (write(sockfd, buffer, msg_len) < 0) {
+        error("Client:: ERROR writing to socket");
+      }
+
+      // espera confirmación del servidor
+      read(sockfd, buffer, 8);
+
+      printf("%f,", (dwalltime() - timestamp) / 2);
+    }
+    printf("\n\n\n");
   }
-
-  bzero(buffer, sizeof(buffer));
   close(sockfd);
-
-  return 0;
 }
