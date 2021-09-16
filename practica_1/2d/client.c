@@ -72,7 +72,7 @@ int main(int argc, char *argv[]) {
 
   for (int i = 3; i < 7; i++) {
     printf("10 a la %d\n", i);
-    for (int j = 0; j < 100; j++) {
+    for (int j = 0; j < 1000; j++) {
       int msg_len = lround(pow(10, i));
 
       // Clean buffer

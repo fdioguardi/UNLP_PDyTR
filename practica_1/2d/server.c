@@ -61,10 +61,9 @@ int main(int argc, char *argv[]) {
   char buffer[lround(pow(10, 6))];
   int msg_len, bytes_read;
   int offset = 0;
-  double timestamp;
 
   for (int i = 3; i < 7; i++) {
-    for (int j = 0; j < 100; j++) {
+    for (int j = 0; j < 1000; j++) {
 
       // longitud del mensaje que toca recibir
       msg_len = lround(pow(10, i));
