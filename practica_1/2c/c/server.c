@@ -82,11 +82,17 @@ int main(int argc, char *argv[]) {
 
     } while (offset != msg_len);
 
-    printf("Server:: Length of message recieved: %d\n", offset);
+    for (int j = 0; j < msg_len; j++) {
+      if (buffer[j] != '$') {
+        error("Server:: ERROR wrong data received");
+      }
+    }
+
+    printf("Server:: Length of message received: %d\n", offset);
     printf("-----------------------------------------------------------\n");
 
     // avisa que el mensaje fue recivido
-    write(newsockfd, "Recieved.", strlen("Recieved."));
+    write(newsockfd, "Received.", strlen("Received."));
 
     offset = 0;
   }
