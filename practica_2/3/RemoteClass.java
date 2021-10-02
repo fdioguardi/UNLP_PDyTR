@@ -28,6 +28,11 @@ public class RemoteClass extends UnicastRemoteObject implements IfaceRemoteClass
 
 		try {
 			File file = new File(this.database + File.separator + name);
+
+			if (! file.exists() || ! file.isFile()) {
+				return new RemoteFile();
+			}
+
 			FileInputStream stream = new FileInputStream(file);
 
 			byte[] result = new byte[(file.length() - offset >= reading_amount) ? reading_amount : (int)(file.length() - offset) ];

@@ -6,6 +6,7 @@
 */
 import java.rmi.registry.Registry; /* REGISTRY_PORT */
 import java.rmi.Naming; /* rebind */
+
 public class StartRemoteObject
 {
 	public static void main (String args[])
