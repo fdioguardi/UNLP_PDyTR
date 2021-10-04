@@ -7,6 +7,8 @@
 * Needed for implementing remote method/s
 */
 
+package server;
+
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 
@@ -14,17 +16,19 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.File;
 
-/* This class implements the interface with remote methods */
-public class RemoteClass extends UnicastRemoteObject implements IfaceRemoteClass {
+import shared.IfaceRemoteClass;
+import shared.IfaceRemoteFile;
 
-	private String database = "files";
+/* This class implements the interface with remote methods */
+class RemoteClass extends UnicastRemoteObject implements IfaceRemoteClass {
+
+	private String database = "server" + File.separator + "files";
 
 	protected RemoteClass() throws RemoteException {
 		super();
 	}
 
-	public RemoteFile leer(String name, int offset, int reading_amount) throws RemoteException {
-
+	public IfaceRemoteFile leer(String name, int offset, int reading_amount) throws RemoteException {
 
 		try {
 			File file = new File(this.database + File.separator + name);
@@ -51,7 +55,7 @@ public class RemoteClass extends UnicastRemoteObject implements IfaceRemoteClass
 
 	public int escribir(String name, int writing_amount, byte[] data) throws RemoteException {
 		try {
-			File file = new File(this.database + File.separator + name);
+			File file = new File(this.database, name);
 			FileOutputStream stream = new FileOutputStream(file, true);
 
 			stream.write(data, 0, writing_amount);
@@ -62,5 +66,10 @@ public class RemoteClass extends UnicastRemoteObject implements IfaceRemoteClass
 		}
 
 		return writing_amount;
+	}
+
+	public boolean exists(String name) {
+		File file = new File(this.database, name);
+		return file.exists() && file.isFile();
 	}
 }

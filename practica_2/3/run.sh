@@ -1,9 +1,12 @@
-#!/bin/sh
+#!/bin/bash
 
 # Test if copies are correct
 
-REMOTE="./files"
-LOCAL="./local_files"
+shopt -s nullglob
+
+REMOTE="server"
+LOCAL="client"
+SHARED="shared"
 
 start_rmiregistry() {
   rmiregistry &
@@ -13,28 +16,30 @@ start_rmiregistry() {
 }
 
 start_remote_object() {
-  java StartRemoteObject &
+  java "$REMOTE".StartRemoteObject &
   while ! [ "$(ss -ta | grep -v TIME-WAIT | grep -c ":rmiregistry")" -ge 3 ]; do
     sleep 0.1
   done
 }
 
-rm -f -- "$REMOTE"/*.txt "$LOCAL"/*.txt
+rm -f -- ./{"$REMOTE","$LOCAL","$SHARED"}/files/*.txt
 
 start_rmiregistry
-javac ./*.java
+javac ./{"$REMOTE","$LOCAL","$SHARED"}/*.java
 
 start_remote_object
-java AskRemote localhost
+java "$LOCAL".AskRemote localhost
 
-for a_file in "$REMOTE"/*.txt; do
-  for two_file in "$LOCAL"/*.txt; do
+declare -a files=(./{"$REMOTE","$LOCAL"}/files/*.txt)
+for a_file in "${files[@]}"; do
+  for two_file in "${files[@]}"; do
     diff "$a_file" "$two_file" \
       || echo "$a_file and $two_file are different" \
       || exit
   done
 done
+unset files
 
-rm ./*.class
+rm ./{"$REMOTE","$LOCAL","$SHARED"}/*.class
 killall rmiregistry
 killall java

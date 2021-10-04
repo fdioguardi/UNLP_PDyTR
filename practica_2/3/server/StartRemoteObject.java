@@ -4,10 +4,13 @@
 * 1) Creates the object which has the remote methods to be invoked
 * 2) Registers the object so that it becomes avaliable
 */
+
+package server;
+
 import java.rmi.registry.Registry; /* REGISTRY_PORT */
 import java.rmi.Naming; /* rebind */
 
-public class StartRemoteObject
+class StartRemoteObject
 {
 	public static void main (String args[])
 	{

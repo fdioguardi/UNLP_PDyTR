@@ -4,9 +4,11 @@
 *
 */
 
-import java.io.Serializable;
+package server;
 
-public class RemoteFile implements Serializable {
+import shared.IfaceRemoteFile;
+
+class RemoteFile implements IfaceRemoteFile {
 
 	private int size;
 	private byte[] content;

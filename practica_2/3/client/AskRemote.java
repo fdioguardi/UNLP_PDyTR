@@ -4,13 +4,18 @@
 * b) "Makes" the RMI
 */
 
+package client;
+
 import java.rmi.Naming; /* lookup */
 import java.rmi.registry.Registry; /* REGISTRY_PORT */
 
 import java.io.File;
 import java.io.FileOutputStream;
 
-public class AskRemote {
+import shared.IfaceRemoteClass;
+import shared.IfaceRemoteFile;
+
+class AskRemote {
 
 	public static void main(String[] args) {
 		/* Look for hostname and msg length in the command line */
@@ -25,21 +30,24 @@ public class AskRemote {
 			IfaceRemoteClass remote = (IfaceRemoteClass) Naming.lookup(rname);
 
 			// Ensure there's something on the server we can copy.
-			File server_file = new File("files" + File.separator + "not_a_rickroll.txt");
-			if (! server_file.exists()) {
-				byte[] content = "Never gonna give you up Never gonna let you down Never gonna run around and desert you Never gonna make you cry Never gonna say goodbye Never gonna tell a lie and hurt you".getBytes();
-				remote.escribir("not_a_rickroll.txt", content.length, content);
+			String filename = "not_a_rickroll.txt";
+			byte[] content = "Never gonna give you up Never gonna let you down Never gonna run around and desert you Never gonna make you cry Never gonna say goodbye Never gonna tell a lie and hurt you".getBytes();
+
+			if (!remote.exists(filename)) {
+				remote.escribir(filename, content.length, content);
 			}
 
-			// Read from server. File is 171 bytes long.
-			RemoteFile result = remote.leer("not_a_rickroll.txt", 0, 200);
+			// Read from server.
+			IfaceRemoteFile result = remote.leer(filename, 0, content.length);
 
 			if (!result.isEmpty()) {
 
 				// Copy file locally, if file exists, overwrite it.
-				File file = new File("local_files" + File.separator + "my_copy_of_something_that_is_definitely_not_a_rickroll.txt");
+				File file = new File("client" + File.separator + "files", "my_copy_of_something_that_is_definitely_not_a_rickroll.txt");
 
-				if (file.exists() && file.isFile()) file.delete();
+				if (file.exists() && file.isFile()) {
+					file.delete();
+				}
 
 				FileOutputStream stream = new FileOutputStream(file);
 
