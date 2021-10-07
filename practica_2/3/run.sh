@@ -8,40 +8,48 @@ REMOTE="server"
 LOCAL="client"
 SHARED="shared"
 
-start_rmiregistry() {
-  rmiregistry &
+wait_rmiregistry() {
   while ! ss -lt | grep -q rmiregistry; do
     sleep 0.1
   done
 }
 
-start_remote_object() {
-  java "$REMOTE".StartRemoteObject &
+wait_server() {
   while ! [ "$(ss -ta | grep -v TIME-WAIT | grep -c ":rmiregistry")" -ge 3 ]; do
     sleep 0.1
   done
 }
 
-[ -d "$REMOTE/files" ] || mkdir "$REMOTE/files"
-[ -d "$LOCAL/files" ] || mkdir "$LOCAL/files"
-rm -f -- ./{"$REMOTE","$LOCAL"}/files/*.txt
+set_files() {
+  [ -d "$REMOTE/files" ] || mkdir "$REMOTE/files"
+  [ -d "$LOCAL/files" ] || mkdir "$LOCAL/files"
+  rm -f -- ./{"$REMOTE","$LOCAL"}/files/*.txt
+}
 
-start_rmiregistry
-javac ./{"$REMOTE","$LOCAL","$SHARED"}/*.java
-
-start_remote_object
-java "$LOCAL".AskRemote localhost
-
-declare -a files=(./{"$REMOTE","$LOCAL"}/files/*.txt)
-for a_file in "${files[@]}"; do
-  for two_file in "${files[@]}"; do
-    diff "$a_file" "$two_file" \
-      || echo "$a_file and $two_file are different" \
-      || exit
+diff_files() {
+  declare -a files=(./{"$REMOTE","$LOCAL"}/files/*.txt)
+  for a_file in "${files[@]}"; do
+    for two_file in "${files[@]}"; do
+      diff "$a_file" "$two_file" \
+        || echo "$a_file and $two_file are different" \
+        || exit
+    done
   done
-done
-unset files
+  unset files
+}
 
-rm ./{"$REMOTE","$LOCAL","$SHARED"}/*.class
-killall rmiregistry
-killall java
+main() {
+  set_files
+  javac ./{"$REMOTE","$LOCAL","$SHARED"}/*.java
+
+  rmiregistry &
+  wait_rmiregistry && java "$REMOTE".StartRemoteObject &
+  wait_server && java "$LOCAL".AskRemote localhost
+
+  diff_files && echo "Copied successfully"
+
+  rm ./{"$REMOTE","$LOCAL","$SHARED"}/*.class
+  killall rmiregistry java
+}
+
+main "$@"
