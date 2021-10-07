@@ -47,7 +47,7 @@ class AskRemote {
 				send_amount = (file.length() - offset < max_size) ? (int)file.length() - offset : max_size;
 
 				// ask the server to write
-				remote.escribir("result", send_amount, result);
+				remote.escribir("result.txt", send_amount, result);
 
 				// increment offset to know when to stop iterating
 				offset += send_amount;
