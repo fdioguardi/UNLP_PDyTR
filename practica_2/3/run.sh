@@ -22,7 +22,9 @@ start_remote_object() {
   done
 }
 
-rm -f -- ./{"$REMOTE","$LOCAL","$SHARED"}/files/*.txt
+[ -d "$REMOTE/files" ] || mkdir "$REMOTE/files"
+[ -d "$LOCAL/files" ] || mkdir "$LOCAL/files"
+rm -f -- ./{"$REMOTE","$LOCAL"}/files/*.txt
 
 start_rmiregistry
 javac ./{"$REMOTE","$LOCAL","$SHARED"}/*.java

@@ -39,7 +39,9 @@ class RemoteClass extends UnicastRemoteObject implements IfaceRemoteClass {
 
 			FileInputStream stream = new FileInputStream(file);
 
-			byte[] result = new byte[(file.length() - offset >= reading_amount) ? reading_amount : (int)(file.length() - offset) ];
+			byte[] result = new byte[((reading_amount > 0) && (file.length() - offset >= reading_amount))
+				? reading_amount
+				: (int)(file.length() - offset) ];
 
 			stream.read(result, offset, result.length);
 			stream.close();
