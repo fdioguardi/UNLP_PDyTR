@@ -33,7 +33,7 @@ class RemoteClass extends UnicastRemoteObject implements IfaceRemoteClass {
 		try {
 			File file = new File(this.database + File.separator + name);
 
-			if (! file.exists() || ! file.isFile()) {
+			if (! file.exists() || ! file.isFile() || offset >= file.length()) {
 				return new RemoteFile();
 			}
 

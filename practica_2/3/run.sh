@@ -23,7 +23,7 @@ wait_server() {
 set_files() {
   [ -d "$REMOTE/files" ] || mkdir "$REMOTE/files"
   [ -d "$LOCAL/files" ] || mkdir "$LOCAL/files"
-  rm -f -- ./{"$REMOTE","$LOCAL"}/files/*.txt
+  rm -f -- ./"$LOCAL"/files/* ./"$REMOTE"/files/copy_*
 }
 
 diff_files() {
@@ -32,7 +32,7 @@ diff_files() {
     for two_file in "${files[@]}"; do
       diff "$a_file" "$two_file" \
         || echo "$a_file and $two_file are different" \
-        || exit
+        || exit 1
     done
   done
   unset files
@@ -44,9 +44,9 @@ main() {
 
   rmiregistry &
   wait_rmiregistry && java "$REMOTE".StartRemoteObject &
-  wait_server && java "$LOCAL".AskRemote localhost
+  wait_server && java "$LOCAL".AskRemote localhost "$@"
 
-  diff_files && echo "Copied successfully"
+  diff_files
 
   rm ./{"$REMOTE","$LOCAL","$SHARED"}/*.class
   killall rmiregistry java

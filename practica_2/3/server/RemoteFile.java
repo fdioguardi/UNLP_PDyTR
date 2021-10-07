@@ -26,7 +26,7 @@ class RemoteFile implements IfaceRemoteFile {
 	}
 
 	public boolean isEmpty() {
-		return this.content == null || this.content.length == 0;
+		return this.content == null || this.content.length == 0 || this.size == 0;
 	}
 
 	public int getSize() {

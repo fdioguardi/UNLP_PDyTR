@@ -11,6 +11,7 @@ import java.rmi.registry.Registry; /* REGISTRY_PORT */
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileInputStream;
 
 import shared.IfaceRemoteClass;
 import shared.IfaceRemoteFile;
@@ -19,9 +20,9 @@ class AskRemote {
 
 	public static void main(String[] args) {
 		/* Look for hostname and msg length in the command line */
-		if (args.length != 1)
+		if (args.length != 3)
 		{
-			System.out.println("1 argument needed: (remote) hostname");
+			System.out.println("2 arguments needed: (remote) hostname, (remote) filepath, (local) path");
 			System.exit(1);
 		}
 
@@ -30,35 +31,88 @@ class AskRemote {
 			IfaceRemoteClass remote = (IfaceRemoteClass) Naming.lookup(rname);
 
 			// Ensure there's something on the server we can copy.
-			String filename = "file.txt";
-			if (!remote.exists(filename)) {
+			File remoteFile = new File(args[1]);
+			if (!remote.exists(remoteFile.getName())) {
 				byte[] content = "Never gonna give you up Never gonna let you down Never gonna run around and desert you Never gonna make you cry Never gonna say goodbye Never gonna tell a lie and hurt you".getBytes();
-				remote.escribir(filename, content.length, content);
+				remote.escribir(remoteFile.getName(), content.length, content);
 			}
 
-			// Read from server.
-			IfaceRemoteFile result = remote.leer(filename, 0, -1);
+			// Copy from the server
+			copy(remote, args[2], remoteFile.getName());
 
-			if (!result.isEmpty()) {
-
-				// Copy file locally, if file exists, overwrite it.
-				File file = new File("client" + File.separator + "files", filename);
-
-				if (file.exists() && file.isFile()) {
-					file.delete();
-				}
-
-				FileOutputStream stream = new FileOutputStream(file);
-
-				stream.write(result.getContent(), 0, result.getSize());
-				stream.close();
-
-				// Send copy to get copied.
-				remote.escribir("copy_" + filename, result.getSize(), result.getContent());
-			}
+			// Send copy to server
+			send_copy(remote, args[2], remoteFile.getName());
 
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	private static void send_copy(IfaceRemoteClass remote, String path, String name) {
+		try {
+			// prepare file and stream
+			File file = new File(path, name);
+			FileInputStream stream = new FileInputStream(file);
+
+			byte[] local_content = new byte[(file.length() > Integer.MAX_VALUE) ? Integer.MAX_VALUE : (int) file.length()];
+			int offset = 0;
+			int writing_amount;
+			do {
+				// read local file in buffer
+				stream.read(local_content);
+
+				// set amount of bytes to write in the server
+				writing_amount = (file.length() - offset < local_content.length)
+					? (int)file.length() - offset
+					: local_content.length;
+
+				// ask the server to write
+				offset += remote.escribir("copy_" + file.getName(), writing_amount, local_content);
+
+			} while (offset < file.length());
+
+			stream.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	private static void copy(IfaceRemoteClass remote, String path, String name) {
+		try {
+			// prepare file
+			File file = new File(path, name);
+
+			// read from server
+			int offset = 0;
+			IfaceRemoteFile result = remote.leer(file.getName(), offset, -1);
+
+			if (result.isEmpty()) {
+				return;
+			}
+
+			// if the file exists in the server and here, delete our file
+			if (file.exists()) {
+				file.delete();
+			}
+
+			// prepare output stream
+			FileOutputStream stream = new FileOutputStream(file, true);
+
+			// there might be more of that sweet data out there
+			while (!result.isEmpty()) {
+
+				// write the result to the local file
+				offset += result.getSize();
+				stream.write(result.getContent());
+
+				// and try to read again, in case part of the file is missing
+				result = remote.leer(file.getName(), offset, -1);
+			}
+
+			stream.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
 	}
 }
