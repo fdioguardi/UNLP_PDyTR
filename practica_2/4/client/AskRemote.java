@@ -30,27 +30,21 @@ class AskRemote {
 			String rname = "//" + args[0] + ":" + Registry.REGISTRY_PORT + "/remote";
 			IfaceRemoteClass remote = (IfaceRemoteClass) Naming.lookup(rname);
 
-			String filename = args[1];
-			File file = new File("client" + File.separator + "files", filename);
-
+			File file = new File(args[1]);
 			FileInputStream stream = new FileInputStream(file);
 
-			int max_size = 2;
-			byte[] result = new byte[max_size];
+			byte[] result = new byte[2];
 			int offset = 0;
-			int send_amount;
+			int writing_amount;
 			do {
 				// read local file in buffer
 				stream.read(result);
 
 				// set amount of bytes to write in the server
-				send_amount = (file.length() - offset < max_size) ? (int)file.length() - offset : max_size;
+				writing_amount = (file.length() - offset < result.length) ? (int)file.length() - offset : result.length;
 
 				// ask the server to write
-				remote.escribir("result.txt", send_amount, result);
-
-				// increment offset to know when to stop iterating
-				offset += send_amount;
+				offset += remote.escribir("result.txt", writing_amount, result);
 
 			} while (offset < file.length());
 

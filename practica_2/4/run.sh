@@ -24,7 +24,7 @@ start_clients() {
   declare -a procs
   for _ in {1..3}; do
     for file in "$LOCAL"/files/*.txt; do
-      java "$LOCAL".AskRemote localhost "$(basename "$file")" &
+      java "$LOCAL".AskRemote localhost "$file" &
       procs+=("$!")
     done
   done
@@ -44,9 +44,11 @@ set_files() {
 main() {
   set_files
   javac ./{"$REMOTE","$LOCAL","$SHARED"}/*.java
+
   rmiregistry &
   wait_rmiregistry && java "$REMOTE".StartRemoteObject &
   wait_server && start_clients
+
   rm ./{"$REMOTE","$LOCAL","$SHARED"}/*.class
   killall rmiregistry java
 }
