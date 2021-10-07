@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Test if copies are correct
+# Execute the test to output response times
 
 shopt -s nullglob
 

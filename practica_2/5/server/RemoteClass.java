@@ -29,7 +29,7 @@ class RemoteClass extends UnicastRemoteObject implements IfaceRemoteClass {
 	}
 
 	/*
-	 * Use it to calculate comm time
+	 * Use it to calculate response times
 	*/
 	public void blank() {}
 
