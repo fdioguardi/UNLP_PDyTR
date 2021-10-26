@@ -1,0 +1,28 @@
+syntax = "proto3";
+package pdytr.cuatro;
+
+message ReadRequest {
+    string name = 1;
+    int32 offset = 2;
+    int32 readingAmount = 3;
+}
+
+message ReadResponse {
+    bytes content = 1;
+    int32 length = 2;
+}
+
+message WriteRequest {
+    string name = 1;
+    int32 writingAmount = 2;
+    bytes data = 3;
+}
+
+message WriteResponse {
+    int32 length = 1;
+}
+
+service FtpService {
+    rpc read(ReadRequest) returns (ReadResponse);
+    rpc write(WriteRequest) returns (WriteResponse);
+}

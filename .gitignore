@@ -1,3 +1,5 @@
 no_me_toques/
+default/
+target/
 *.out
 *.class
