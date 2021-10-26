@@ -1,0 +1,7 @@
+syntax = "proto3";
+package pdytr.cinco;
+import "google/protobuf/empty.proto";
+
+service BlankService {
+    rpc blank(google.protobuf.Empty) returns (google.protobuf.Empty) {}
+}
