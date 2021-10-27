@@ -6,10 +6,10 @@ import io.grpc.*;
 import pdytr.example.grpc.GreetingServiceGrpc;
 import pdytr.example.grpc.GreetingServiceOuterClass;
 
-public class Client
-{
-    public static void main( String[] args ) throws Exception
-    {
+public class Client {
+
+    public static void main( String[] args ) throws Exception {
+
         // Channel is the abstraction to connect to a service endpoint
         // Let's use plaintext communication because we don't have certs
         final ManagedChannel channel = ManagedChannelBuilder.forTarget("localhost:8080")
@@ -39,13 +39,13 @@ public class Client
         }.start();
 
 
-      // Finally, make the call using the stub
-      GreetingServiceOuterClass.HelloResponse response =
+        // Finally, make the call using the stub
+        GreetingServiceOuterClass.HelloResponse response =
         stub.greeting(request);
 
-      System.out.println(response);
+        System.out.println(response);
 
-      // A Channel should be shutdown before stopping the process.
-      channel.shutdownNow();
+        // A Channel should be shutdown before stopping the process.
+        channel.shutdownNow();
     }
 }

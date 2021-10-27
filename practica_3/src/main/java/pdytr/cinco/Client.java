@@ -12,17 +12,17 @@ import com.google.protobuf.Empty;
 import pdytr.cinco.BlankServiceGrpc.BlankServiceBlockingStub;
 import static pdytr.cinco.BlankServiceGrpc.newBlockingStub;
 
-public class Client
-{
-	private static final String database = "src" + File.separator
-                            + "main" + File.separator
-                            + "java" + File.separator
-                            + "pdytr" + File.separator
-                            + "cinco" + File.separator
-                            + "files";
+public class Client {
 
-    public static void main(String[] args) throws Exception
-    {
+    private static final String database = "src" + File.separator
+                                         + "main" + File.separator
+                                         + "java" + File.separator
+                                         + "pdytr" + File.separator
+                                         + "cinco" + File.separator
+                                         + "files";
+
+    public static void main(String[] args) throws Exception {
+
         final ManagedChannel channel = ManagedChannelBuilder.forTarget("localhost:8080")
             .usePlaintext(true)
             .build();
@@ -39,19 +39,20 @@ public class Client
             // craete the read request
             Empty empty = Empty.newBuilder().build();
 
-			long start, end;
-			for (int i = 0; i < 100000; i++) {
-				start = System.nanoTime();
+            long start, end;
+            for (int i = 0; i < 100000; i++) {
+                start = System.nanoTime();
                 stub.blank(empty);
-				end = System.nanoTime();
+                end = System.nanoTime();
 
                 bw.write(Double.toString((end - start) / 1000000.0));
                 bw.newLine();
-			}
+            }
             bw.close();
 
         } catch (Exception e) {
             e.printStackTrace();
+
         } finally {
             channel.shutdownNow();
         }

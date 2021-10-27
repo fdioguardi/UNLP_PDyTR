@@ -7,9 +7,10 @@ import pdytr.example.grpc.GreetingServiceGrpc;
 import pdytr.example.grpc.GreetingServiceOuterClass;
 
 public class GreetingServiceImpl extends GreetingServiceGrpc.GreetingServiceImplBase {
-  @Override
-  public void greeting(GreetingServiceOuterClass.HelloRequest request,
+    @Override
+    public void greeting(GreetingServiceOuterClass.HelloRequest request,
         StreamObserver<GreetingServiceOuterClass.HelloResponse> responseObserver) {
+
         try {
 
             TimeUnit.MILLISECONDS.sleep(2500);
@@ -27,8 +28,9 @@ public class GreetingServiceImpl extends GreetingServiceGrpc.GreetingServiceImpl
 
             // When you are done, you must call onCompleted.
             responseObserver.onCompleted();
-		} catch (Exception e) {
-			e.printStackTrace();
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }

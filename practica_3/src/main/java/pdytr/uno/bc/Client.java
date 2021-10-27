@@ -6,10 +6,9 @@ import java.util.concurrent.TimeUnit;
 import pdytr.example.grpc.GreetingServiceGrpc;
 import pdytr.example.grpc.GreetingServiceOuterClass;
 
-public class Client
-{
-    public static void main( String[] args ) throws Exception
-    {
+public class Client {
+
+    public static void main( String[] args ) throws Exception {
         // Channel is the abstraction to connect to a service endpoint
         // Let's use plaintext communication because we don't have certs
         final ManagedChannel channel = ManagedChannelBuilder.forTarget("localhost:8080")
@@ -24,17 +23,13 @@ public class Client
             .setName("General Kenobi")
             .build();
 
-      // Finally, make the call using the stub
+        // Finally, make the call using the stub
         GreetingServiceOuterClass.HelloResponse response = null;
-        try {
-      	    response = stub.withDeadlineAfter(3000, TimeUnit.MILLISECONDS).greeting(request);
-        } catch (Exception e) {
-	    e.printStackTrace();
-	}
+        response = stub.withDeadlineAfter(3000, TimeUnit.MILLISECONDS).greeting(request);
 
-      if (response != null) System.out.println(response);
+        if (response != null) System.out.println(response);
 
-      // A Channel should be shutdown before stopping the process.
-      channel.shutdownNow();
+        // A Channel should be shutdown before stopping the process.
+        channel.shutdownNow();
     }
 }

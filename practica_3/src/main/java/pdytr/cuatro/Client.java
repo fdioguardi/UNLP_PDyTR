@@ -13,8 +13,7 @@ import pdytr.cuatro.FtpServiceOuterClass.ReadResponse;
 import pdytr.cuatro.FtpServiceOuterClass.WriteRequest;
 import pdytr.cuatro.FtpServiceOuterClass.WriteResponse;
 
-public class Client
-{
+public class Client {
 	private static final String database = "src" + File.separator
                             + "main" + File.separator
                             + "java" + File.separator
@@ -22,8 +21,8 @@ public class Client
                             + "cuatro" + File.separator
                             + "files";
 
-    public static void main(String[] args) throws Exception
-    {
+    public static void main(String[] args) throws Exception {
+
         if (args.length != 1) {
             System.err.println("usage: Client FILE_TO_READ");
             System.exit(1);
@@ -81,13 +80,14 @@ public class Client
                 // increment the offset
                 offset += writeResponse.getLength();
 
-			} while (offset < content.length - 1);
+            } while (offset < content.length - 1);
 
         } catch (Exception e) {
             e.printStackTrace();
+
         } finally {
-          // A Channel should be shutdown before stopping the process.
-          channel.shutdownNow();
+            // A Channel should be shutdown before stopping the process.
+            channel.shutdownNow();
         }
     }
 }
