@@ -2,6 +2,11 @@ syntax = "proto3";
 package pdytr.cinco;
 import "google/protobuf/empty.proto";
 
+message Content {
+    bytes data = 1;
+}
+
 service BlankService {
     rpc blank(google.protobuf.Empty) returns (google.protobuf.Empty) {}
+    rpc full(Content) returns (Content) {}
 }
