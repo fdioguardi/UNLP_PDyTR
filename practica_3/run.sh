@@ -1,5 +1,8 @@
 #!/bin/sh
 
+# Example usage: ./run.sh cuatro App -o package
+#                ./run.sh cuatro Client a.txt & ./run.sh cuatro Client b.txt &
+
 usage() {
   echo "usage: $0 PACKAGE CLASS [(-o | --option) OPT]" && exit "$1"
 }
@@ -23,9 +26,9 @@ while [ -n "$1" ]; do
       elif [ -z "$side" ]; then
         side="$1"
       elif [ -z "$args" ]; then
-	args="$1"
+        args="$1"
       else
-	args="$args"" $1"
+        args="$args"" $1"
       fi
       ;;
 
