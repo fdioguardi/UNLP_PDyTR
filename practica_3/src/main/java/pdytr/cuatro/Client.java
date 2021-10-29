@@ -24,7 +24,7 @@ public class Client {
     public static void main(String[] args) throws Exception {
 
         if (args.length != 1) {
-            System.err.println("usage: Client FILE_TO_READ");
+            System.err.println("usage: Client <filename>");
             System.exit(1);
         }
 
@@ -39,12 +39,12 @@ public class Client {
             // create the stub
             FtpServiceBlockingStub stub = newBlockingStub(channel);
 
-            // craete the read request
-            // to read the entire FILE_TO_READ (or as much as you can in one go)
+            // create a read request of a maximum size of 1MB
+            // (there's no need to read the whole file)
             ReadRequest readRequest = ReadRequest.newBuilder()
                 .setName(file.getName())
                 .setOffset(0)
-                .setReadingAmount(-1)
+                .setReadingAmount((int)file.length() < 1024 ? (int)file.length() : 1024)
                 .build();
 
             // make the call to read using the stub (expect a response from the server)
@@ -55,32 +55,21 @@ public class Client {
              * (as every client tries to write to the same file, this should boom boom most of the time)
             */
 
-			byte[] content = readResponse.getContent().toByteArray();
-            byte[] bytesToSend = null;
-			int offset = 0;
-			int writing_amount;
-            WriteResponse writeResponse = null;
-			do {
-				// create buffer to send
-                bytesToSend = new byte[2];
-                bytesToSend[0] = content[offset];
-                bytesToSend[1] = content[offset + 1];
-
+            int offset = 0;
+            while (offset < readResponse.getContent().size()) {
                 // create the write request
-                // to write to a file named "file.txt"
                 WriteRequest writeRequest = WriteRequest.newBuilder()
                     .setName("file.txt")
-                    .setWritingAmount(bytesToSend.length)
-                    .setData(ByteString.copyFrom(bytesToSend))
+                    .setData(ByteString.copyFrom(readResponse.getContent().substring(offset, offset + 2).toByteArray()))
+                    .setWritingAmount(2)
                     .build();
 
-                // make the call to write using the stub
-                writeResponse = stub.write(writeRequest);
+                // make the call to write using the stub (expect a response from the server)
+                WriteResponse writeResponse = stub.write(writeRequest);
 
-                // increment the offset
-                offset += writeResponse.getLength();
-
-            } while (offset < content.length - 1);
+                // update the offset
+                offset += 2;
+            }
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -88,6 +77,7 @@ public class Client {
         } finally {
             // A Channel should be shutdown before stopping the process.
             channel.shutdownNow();
+            channel.awaitTermination(5, java.util.concurrent.TimeUnit.SECONDS);
         }
     }
 }
