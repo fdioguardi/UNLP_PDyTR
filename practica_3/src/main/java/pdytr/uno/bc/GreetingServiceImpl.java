@@ -13,7 +13,7 @@ public class GreetingServiceImpl extends GreetingServiceGrpc.GreetingServiceImpl
 
         try {
 
-            TimeUnit.MILLISECONDS.sleep(2500);
+            TimeUnit.MILLISECONDS.sleep(3000);
 
             // HelloRequest has toString auto-generated.
             System.out.println(request);
