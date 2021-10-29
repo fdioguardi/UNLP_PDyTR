@@ -37,8 +37,8 @@ public class Client {
             BlankServiceBlockingStub stub = newBlockingStub(channel);
 
             // create buffered writer
-            BufferedWriter emptyBw = createStreamWriter("times_con_mensaje_vacio.csv");
-            BufferedWriter fullBw = createStreamWriter("times.csv");
+            BufferedWriter emptyBw = createBufferedWriter("times_con_mensaje_vacio.csv");
+            BufferedWriter fullBw = createBufferedWriter("times.csv");
 
             // craete the read requests
             Empty empty = Empty.newBuilder().build();
@@ -88,7 +88,7 @@ public class Client {
         return ByteString.copyFrom(data);
     }
 
-    private static BufferedWriter createStreamWriter(String filename) throws Exception {
+    private static BufferedWriter createBufferedWriter(String filename) throws Exception {
         return new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(DATABASE, filename))));
     }
 }
