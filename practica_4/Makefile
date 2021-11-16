@@ -18,11 +18,10 @@ help:
 build: buildrec buildsum
 
 buildrec:
-	@echo "build 1"
-	#cd 1 && mkdir classes && javac -cp ../lib/jade.jar:src -d classes src/Agent1.java
+	cd 1 && rm -rf classes && mkdir classes && javac -cp ../lib/jade.jar:src -d classes src/Agent1.java
 
 buildsum:
-	cd 2 && mkdir classes && javac -cp ../lib/jade.jar:src -d classes src/Agent2.java
+	cd 2 && rm -rf classes && mkdir classes && javac -cp ../lib/jade.jar:src -d classes src/Agent2.java
 
 server:
 	java -cp lib/jade.jar:classes jade.Boot -gui -local-host 127.0.0.1
@@ -34,5 +33,5 @@ sum: buildsum
 	cd 2 && java -cp ../lib/jade.jar:classes jade.Boot -gui -container -host localhost -agents a2:Agent2'(Main-Container, /pdytr/2/files/numbers.csv)'
 
 clean:
-	- sudo rm -f APDescription.txt MTPs-Main-Container.txt
-	- $(foreach dir, $(dirs), sudo rm -rf $(dir)/classes;)
+	rm -f APDescription.txt MTPs-Main-Container.txt || sudo rm -f APDescription.txt MTPs-Main-Container.txt
+	$(foreach dir, $(dirs), rm -rf $(dir)/classes || sudo rm -rf $(dir)/classes;)
