@@ -27,7 +27,7 @@ public class Agent2 extends Agent {
       this.doMove(destination);
 
     } catch (Exception e) {
-      System.out.println("Agent2: Error while trying to move to " +
+      System.err.println("Agent2: Error while trying to move to " +
                          this.args[0]);
       e.printStackTrace();
     }
