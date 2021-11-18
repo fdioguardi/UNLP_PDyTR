@@ -6,30 +6,36 @@ import java.io.Serializable;
 public class Ftp {
 
   public static byte[] read(String name, int offset, int reading_amount) {
+    File file = new File(name);
+
+    if (!file.exists() || !file.isFile() || offset >= file.length()) {
+      return null;
+    }
+
+    byte[] result = null;
+
     try {
-      File file = new File(name);
 
-      if (!file.exists() || !file.isFile() || offset >= file.length()) {
-        return null;
-      }
+      FileInputStream fi = new FileInputStream(file);
 
-      FileInputStream stream = new FileInputStream(file);
+      fi.skip(offset);
 
-      byte[] result = new byte[((reading_amount > 0) &&
-                                (file.length() - offset >= reading_amount))
-                                   ? reading_amount
-                                   : (int)(file.length() - offset)];
+      reading_amount = reading_amount > 0 ? reading_amount : 10000000;
+      reading_amount = Math.min(reading_amount, (int)(file.length() - offset));
 
-      stream.read(result, offset, result.length);
-      stream.close();
+      result = new byte[reading_amount];
 
-      return result;
+      fi.read(result, 0, result.length);
+
+      System.out.println("Total bytes read: " + offset);
+      fi.close();
 
     } catch (Exception e) {
       e.printStackTrace();
-    }
 
-    return null;
+    } finally {
+      return result;
+    }
   }
 
   public static int write(String name, int writing_amount, byte[] data) {

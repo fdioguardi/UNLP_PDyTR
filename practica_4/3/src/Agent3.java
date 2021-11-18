@@ -56,7 +56,7 @@ public class Agent3 extends Agent {
         // lee el archivo local
         System.gc();
         this.ftpFile = Ftp.read(this.filenameOrigin, this.offset,
-                                1000); // TODO: offset
+                                10000000); // TODO: offset
 
         // termine de leer? entonces cambio sec op complete a true
         if (this.ftpFile == null) {
@@ -77,7 +77,7 @@ public class Agent3 extends Agent {
         // lee el archivo origianl del container destino
         System.gc();
         this.ftpFile = Ftp.read(this.filenameDestination, this.offset,
-                                1000); // TODO: offset
+                                10000000); // TODO: offset
 
         // termine de leer? entonces cambio first op complete a true
         if (this.ftpFile == null) {
