@@ -110,6 +110,7 @@ public class Agent1 extends Agent implements Serializable {
       cd.print();
       memsum += cd.getFreeMemory();
     }
+    System.out.println("Total de memoria libre: " + memsum);
 
     System.out.println(
         "\n\n--------------------------------------------------------\n\n");
@@ -142,10 +143,6 @@ public class Agent1 extends Agent implements Serializable {
           current = cd;
           break;
         }
-      }
-      if (current == null) {
-        System.err.println("todo mal");
-        System.exit(1);
       }
 
       // create os bean
