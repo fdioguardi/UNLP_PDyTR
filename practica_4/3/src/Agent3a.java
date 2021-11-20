@@ -27,15 +27,20 @@ public class Agent3a extends Agent {
     this.destination = this.getArguments()[1].toString();
 
     this.filename = this.getArguments()[2].toString();
-    this.filenameOrigin = "/pdytr/3/filesOrigin/" + this.filename;
-    this.filenameDestination = "/pdytr/3/filesDestination/" + this.filename;
+    this.filenameOrigin = "/pdytr/3/origin_files/" + this.filename;
+    this.filenameDestination = "/pdytr/3/destination_files/" + this.filename;
 
     this.op = this.getArguments()[0].toString();
 
     if (this.op.equals("-w")) {
       this.ftpFile = Ftp.read(this.filenameOrigin, this.offset, 10000000);
-      if (this.ftpFile != null)
+      if (this.ftpFile != null) {
         this.offset += this.ftpFile.length;
+      } else {
+        System.err.println("Agent3a: cannot access '" + this.filenameOrigin +
+                           "': No such file or directory");
+        System.exit(2);
+      }
     }
 
     try {
@@ -68,9 +73,9 @@ public class Agent3a extends Agent {
 
       this.ftpFile = Ftp.read(this.filenameOrigin, this.offset, 10000000);
 
-      // termine de leer? entonces cambio sec op complete a true
+      // termine de leer
       if (this.ftpFile == null) {
-        this.doDelete();
+        System.exit(0);
       } else {
         this.offset += this.ftpFile.length;
       }
@@ -102,9 +107,9 @@ public class Agent3a extends Agent {
       // lee el archivo origianl del container destino
       this.ftpFile = Ftp.read(this.filenameDestination, this.offset, 10000000);
 
-      // termine de leer? entonces cambio first op complete a true
+      // termine de leer
       if (this.ftpFile == null) {
-        this.doDelete();
+        System.exit(0);
       } else {
         this.offset += this.ftpFile.length;
       }

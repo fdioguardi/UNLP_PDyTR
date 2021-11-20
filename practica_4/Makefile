@@ -1,6 +1,6 @@
 dirs := 1 2 3
 op := -w
-ftpFilename := archivo.pdf
+ftpFilename := prueba.txt
 
 all: clean build
 
@@ -15,7 +15,7 @@ help:
 	@echo "  server:   Ejecuta el 'server'"
 	@echo "  rec:      Compila y ejecuta el ejercicio 1"
 	@echo "  sum:      Compila y ejecuta el ejercicio 2"
-	@echo "  ftp:      Compila y ejecuta el ejercicio 3a"
+	@echo "  ftpa:     Compila y ejecuta el ejercicio 3a"
 	@echo "  ftpb:     Compila y ejecuta el ejercicio 3b"
 	@echo "—————————————————————————————————————————————"
 

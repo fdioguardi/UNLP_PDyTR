@@ -40,7 +40,7 @@ public class Agent2 extends Agent {
       System.out.println("Agent2: I am back to my origin");
       System.out.println("Agent2: Sum of numbers in " + this.args[1] + ": " +
                          this.sum);
-      this.doDelete();
+      System.exit(0);
     } else {
 
       try {

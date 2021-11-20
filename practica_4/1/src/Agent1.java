@@ -1,12 +1,3 @@
-/*
- * This agent will move through a list of containers and calculate:
- *         - the total time it takes to move through the list
- *         - the cpu load of each container
- *         - the total amount of free memory in each container
- *         - the names of the containers
- *  It is a simple agent, so it will only use te setup method and the afterMove
- * method. Once the agent is back at the origin, it will print out the results.
- */
 import com.sun.management.OperatingSystemMXBean;
 import jade.core.*;
 import jade.wrapper.*;
@@ -122,18 +113,19 @@ public class Agent1 extends Agent implements Serializable {
       newData.add(new ContainerData(cd.getName()));
     }
     this.containers = newData;
+    this.startTime = System.currentTimeMillis();
   }
 
   protected void afterMove() {
     // if we are back at origin
     if (this.here().getName().equals(this.origin)) {
       this.printInfo();
-      this.reset();
       try {
         TimeUnit.SECONDS.sleep(1);
       } catch (InterruptedException e) {
         e.printStackTrace();
       }
+      this.reset();
       this.doMove(this.nextContainer());
     } else {
       // get data to load

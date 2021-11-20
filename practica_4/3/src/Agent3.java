@@ -5,11 +5,12 @@ import java.util.*;
 public class Agent3 extends Agent {
 
   private String destination;
+  private String filename;
   private String filenameDestination;
   private String filenameOrigin;
-  private String filename;
   private String origin;
   private String[] args = new String[2];
+  private boolean doesFileExist;
   private boolean isFirstOpComplete = false;
   private byte[] ftpFile;
   private int offset = 0;
@@ -24,8 +25,8 @@ public class Agent3 extends Agent {
     this.destination = this.getArguments()[0].toString();
 
     this.filename = this.getArguments()[1].toString();
-    this.filenameOrigin = "/pdytr/3/filesOrigin/" + this.filename;
-    this.filenameDestination = "/pdytr/3/filesDestination/" + this.filename;
+    this.filenameOrigin = "/pdytr/3/origin_files/" + this.filename;
+    this.filenameDestination = "/pdytr/3/destination_files/" + this.filename;
 
     try {
       // Create a new container
@@ -54,13 +55,11 @@ public class Agent3 extends Agent {
         // copiar archivo local en destino
 
         // lee el archivo local
-        System.gc();
-        this.ftpFile = Ftp.read(this.filenameOrigin, this.offset,
-                                10000000); // TODO: offset
+        this.ftpFile = Ftp.read(this.filenameOrigin, this.offset, 10000000);
 
-        // termine de leer? entonces cambio sec op complete a true
+        // termine de leer
         if (this.ftpFile == null) {
-          this.doDelete();
+          System.exit(0);
         } else {
           this.offset += this.ftpFile.length;
         }
@@ -74,17 +73,22 @@ public class Agent3 extends Agent {
       if (!this.isFirstOpComplete) {
         // estoy copiando el archivo al origen
 
+        // existe el archivo? sino me las tomo. solo checkeo una vez
+        if (!this.doesFileExist) {
+          this.ensureFileExists(this.filenameDestination);
+        }
+
         // lee el archivo origianl del container destino
-        System.gc();
-        this.ftpFile = Ftp.read(this.filenameDestination, this.offset,
-                                10000000); // TODO: offset
+        this.ftpFile =
+            Ftp.read(this.filenameDestination, this.offset, 10000000);
 
         // termine de leer? entonces cambio first op complete a true
         if (this.ftpFile == null) {
+
           this.isFirstOpComplete = true;
           this.offset = 0;
           this.filenameDestination =
-              "/pdytr/3/filesDestination/copy_" + this.filename;
+              "/pdytr/3/destination_files/copy_" + this.filename;
         } else {
           this.offset += this.ftpFile.length;
         }
@@ -96,6 +100,17 @@ public class Agent3 extends Agent {
 
       // voy al origen
       this.doMove(new ContainerID(this.origin, null));
+    }
+  }
+
+  private void ensureFileExists(String a_filename) {
+    File file = new File(a_filename);
+    if (!file.exists()) {
+      System.err.println("Agent3: cannot access '" + a_filename +
+                         "': No such file or directory");
+      this.doDelete();
+    } else {
+      this.doesFileExist = true;
     }
   }
 }
